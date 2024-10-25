@@ -6,16 +6,11 @@ package com.mycompany.assingment;
 
 
 import java.io.File;
-import javax.swing.JFileChooser;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +29,15 @@ public class AssingmentForm extends javax.swing.JFrame {
     
     String templateContent;
     String contentWithOutComments;
+    
+    private Map<String, String> symbolTableMap = new HashMap<String, String>();
+   
+    HashMap<String, String> parens = new HashMap<String, String>();
+    
+    
+    
+    
+
     private static final Set<String> KEYWORDS = new HashSet<>(Arrays.asList(
         "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", 
         "const", "continue", "default", "do", "double", "else", "enum", "extends", "final", 
@@ -41,31 +45,9 @@ public class AssingmentForm extends javax.swing.JFrame {
         "int", "interface", "long", "native", "new", "null", "package", "private", 
         "protected", "public", "return", "short", "static", "strictfp", "super", 
         "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", 
-        "volatile", "while" , "for" , "String" , "String[] args","main"
+        "volatile", "while" , "for" , "String" , "String[]args","main"
     ));
-    class SymbolInfo {
-    String type;
-    String value;
-    
 
-    public SymbolInfo(String type, String value) {
-        this.type = type;
-        this.value = value;
-        
-    }
-
-    @Override
-    public String toString() {
-        return "Type: " + type + ", Value: " + value ;
-    }
-}
-
-private Map<String, SymbolInfo> symbolTable = new HashMap<>();
-private void storeInSymbolTable(String token, String type) {
-    if (!symbolTable.containsKey(token)) {
-        symbolTable.put(token, new SymbolInfo(type, token));
-    }
-}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -86,10 +68,16 @@ private void storeInSymbolTable(String token, String type) {
         recKeywordsButton = new javax.swing.JButton();
         recIdentifiersButton = new javax.swing.JButton();
         recOperators = new javax.swing.JButton();
-        lexemeTokenButton = new javax.swing.JButton();
         symbolTblButton = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        symbolTable = new javax.swing.JTable();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tokenTable = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Lexical Analyzer");
 
         jButton1.setText("Select File");
         jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -149,19 +137,44 @@ private void storeInSymbolTable(String token, String type) {
             }
         });
 
-        lexemeTokenButton.setText("Lexeme Token Pairs");
-        lexemeTokenButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lexemeTokenButtonMouseClicked(evt);
-            }
-        });
-
-        symbolTblButton.setText("Symbol Tabel");
+        symbolTblButton.setText("Analyze");
         symbolTblButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 symbolTblButtonMouseClicked(evt);
             }
         });
+
+        symbolTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Identifier", "DataType"
+            }
+        ));
+        jScrollPane2.setViewportView(symbolTable);
+
+        tokenTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Lexeme", "Token"
+            }
+        ));
+        jScrollPane3.setViewportView(tokenTable);
+
+        jLabel1.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
+        jLabel1.setText("Symbol Tabel");
+
+        jLabel2.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
+        jLabel2.setText("Lexeme Token Pairs");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -177,13 +190,19 @@ private void storeInSymbolTable(String token, String type) {
                     .addComponent(recIdentifiersButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(recOperators, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lexemeTokenButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(symbolTblButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 132, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
-                    .addComponent(FilePathField))
-                .addGap(39, 39, 39))
+                .addGap(79, 79, 79)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addComponent(FilePathField, javax.swing.GroupLayout.PREFERRED_SIZE, 535, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(37, 37, 37)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2))
+                .addGap(62, 62, 62))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -191,11 +210,9 @@ private void storeInSymbolTable(String token, String type) {
                 .addGap(45, 45, 45)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-                    .addComponent(FilePathField))
+                    .addComponent(FilePathField)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(67, 67, 67)
                         .addComponent(removeCommentsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -205,15 +222,24 @@ private void storeInSymbolTable(String token, String type) {
                         .addComponent(recConstantsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(recKeywordsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addGap(17, 17, 17)
                         .addComponent(recIdentifiersButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(recOperators, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30)
+                        .addComponent(symbolTblButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lexemeTokenButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(symbolTblButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(22, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 484, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 53, Short.MAX_VALUE))))
         );
 
         pack();
@@ -250,8 +276,6 @@ private void storeInSymbolTable(String token, String type) {
         // TODO add your handling code here:
         String contentWithOutSpace = contentWithOutComments.replaceAll("\\s+"," ");
         jTextArea.setText(contentWithOutSpace);
-
-        
     }//GEN-LAST:event_removeWhiteSpacesButtonMouseClicked
 
     private void removeCommentsButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_removeCommentsButtonMouseClicked
@@ -300,7 +324,7 @@ private void storeInSymbolTable(String token, String type) {
         while(identifierMatcher.find()){
             String match = identifierMatcher.group();
             if(!KEYWORDS.contains(match)){
-                storeInSymbolTable(match, "Identifier");
+
                 jTextArea.append(match + System.lineSeparator());
         }
         }
@@ -314,32 +338,93 @@ private void storeInSymbolTable(String token, String type) {
  
         while (operatorMatcher.find()) {
             String operator = operatorMatcher.group();
-            storeInSymbolTable(operator, "Operator");
+
            
             operators.append(operatorMatcher.group()).append("\n");
         }
         jTextArea.setText(operators.toString());
     }//GEN-LAST:event_recOperatorsMouseClicked
 
-    private void lexemeTokenButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lexemeTokenButtonMouseClicked
-        // TODO add your handling code here:
-        StringBuilder lexemeTokenPairs = new StringBuilder();
-        for (Map.Entry<String, SymbolInfo> entry : symbolTable.entrySet()) {
-            lexemeTokenPairs.append("Lexeme: ").append(entry.getKey())
-                        .append(" ,   Token: ").append(entry.getValue().type)                  
-                        .append("\n");
-        }
-        jTextArea.setText(lexemeTokenPairs.toString());
-    }//GEN-LAST:event_lexemeTokenButtonMouseClicked
+    // Token Table
+
+    boolean isDataType(String lexeme) {
+        return lexeme.equals("int") || lexeme.equals("float") || lexeme.equals("double") || lexeme.equals("char") || lexeme.equals("boolean") || lexeme.equals("String");
+    } 
 
     private void symbolTblButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_symbolTblButtonMouseClicked
         // TODO add your handling code here:
-         StringBuilder symbolTableContent = new StringBuilder();
-         for (Map.Entry<String, SymbolInfo> entry : symbolTable.entrySet()) {
-            symbolTableContent.append(entry.getKey()).append(" -> ").append(entry.getValue().toString()).append("\n");
+        
+        parens.put("{","left Curly Paren");
+        parens.put("}","right Curly Paren");
+        parens.put("[","left square Paren");
+        parens.put("]","right square Paren");
+        parens.put("(","left round Paren");
+        parens.put(")","right round Paren");
+        parens.put(";", "semicolon");
+    
+        
+        
+        DefaultTableModel symbolModel = (DefaultTableModel) symbolTable.getModel();
+        DefaultTableModel tokenModel = (DefaultTableModel) tokenTable.getModel();
+        
+       
+        symbolModel.setRowCount(0);
+        tokenModel.setRowCount(0);
+        
+        Pattern NUMBER_PATTERN = Pattern.compile("\\b\\d+(\\.\\d+)?(f|F|d|D|l|L)?\\b");
+        Pattern OPERATORS = Pattern.compile("[+\\-*/=<>!]+");
+        Pattern IDENTIFIER_PATTERN = Pattern.compile("\\b[A-Za-z_][A-Za-z0-9_]*\\b");
+        
+        
+        String[] tokens = contentWithOutComments.split("[\\s;]+");
+        //        String[] tokens = contentWithOutComments.split("[\\s;(){}\\[\\],]+");
+
+        String currentDataType="";
+        
+        
+        
+        for (String lexeme : tokens){
+            System.out.println(lexeme);
+           // String lexeme = tokenizer.nextToken();
+            if (lexeme.trim().isEmpty()) continue;
+
+            // Check if the lexeme is a keyword
+            if (KEYWORDS.contains(lexeme)) {
+                tokenModel.addRow(new Object[]{lexeme, "Keyword"});
+                currentDataType = isDataType(lexeme) ? lexeme : currentDataType;
+            }
+            // Check if the lexeme is an operator
+            else if (OPERATORS.matcher(lexeme).matches()) {
+                tokenModel.addRow(new Object[]{lexeme, "Operator"});
+            }
+            // Check if the lexeme is a number
+            else if (NUMBER_PATTERN.matcher(lexeme).matches()) {
+                tokenModel.addRow(new Object[]{lexeme, "Constant"});
+            }
+            // Check if the lexeme is an identifier
+            else if (IDENTIFIER_PATTERN.matcher(lexeme).matches()) {
+                if (!symbolTableMap.containsKey(lexeme) && !currentDataType.isEmpty()) {
+                    symbolTableMap.put(lexeme, currentDataType);
+                }
+                tokenModel.addRow(new Object[]{lexeme, "Identifier"});
+            }
+            else if (parens.containsKey(lexeme)) {
+                tokenModel.addRow(new Object[]{lexeme, parens.get(lexeme)});
+            }
+            // Handle special symbols and others
+            else {
+                tokenModel.addRow(new Object[]{lexeme, "Unknown"});
+            }
         }
-         jTextArea.setText(symbolTableContent.toString());
+
+        // Fill the symbol table
+        for (Map.Entry<String, String> entry : symbolTableMap.entrySet()) {
+            symbolModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
+        }
+        
+
     }//GEN-LAST:event_symbolTblButtonMouseClicked
+
 
     /**
      * @param args the command line arguments
@@ -379,15 +464,20 @@ private void storeInSymbolTable(String token, String type) {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField FilePathField;
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea jTextArea;
-    private javax.swing.JButton lexemeTokenButton;
     private javax.swing.JButton recConstantsButton;
     private javax.swing.JButton recIdentifiersButton;
     private javax.swing.JButton recKeywordsButton;
     private javax.swing.JButton recOperators;
     private javax.swing.JButton removeCommentsButton;
     private javax.swing.JButton removeWhiteSpacesButton;
+    private javax.swing.JTable symbolTable;
     private javax.swing.JButton symbolTblButton;
+    private javax.swing.JTable tokenTable;
     // End of variables declaration//GEN-END:variables
 }
