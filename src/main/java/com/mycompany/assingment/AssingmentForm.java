@@ -41,26 +41,32 @@ public class AssingmentForm extends javax.swing.JFrame {
         "int", "interface", "long", "native", "new", "null", "package", "private", 
         "protected", "public", "return", "short", "static", "strictfp", "super", 
         "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", 
-        "volatile", "while" , "for" , "String" , "String[]"
+        "volatile", "while" , "for" , "String" , "String[] args","main"
     ));
     class SymbolInfo {
     String type;
     String value;
-    int position;
+    
 
-    public SymbolInfo(String type, String value, int position) {
+    public SymbolInfo(String type, String value) {
         this.type = type;
         this.value = value;
-        this.position = position;
+        
     }
 
     @Override
     public String toString() {
-        return "Type: " + type + ", Value: " + value + ", Position: " + position;
+        return "Type: " + type + ", Value: " + value ;
     }
 }
 
 private Map<String, SymbolInfo> symbolTable = new HashMap<>();
+private void storeInSymbolTable(String token, String type) {
+    if (!symbolTable.containsKey(token)) {
+        symbolTable.put(token, new SymbolInfo(type, token));
+    }
+}
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -74,12 +80,14 @@ private Map<String, SymbolInfo> symbolTable = new HashMap<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea = new javax.swing.JTextArea();
         FilePathField = new javax.swing.JTextField();
-        jButton4 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
+        removeWhiteSpacesButton = new javax.swing.JButton();
+        removeCommentsButton = new javax.swing.JButton();
+        recConstantsButton = new javax.swing.JButton();
+        recKeywordsButton = new javax.swing.JButton();
+        recIdentifiersButton = new javax.swing.JButton();
+        recOperators = new javax.swing.JButton();
+        lexemeTokenButton = new javax.swing.JButton();
+        symbolTblButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -99,45 +107,59 @@ private Map<String, SymbolInfo> symbolTable = new HashMap<>();
         jTextArea.setRows(5);
         jScrollPane1.setViewportView(jTextArea);
 
-        jButton4.setText("Remove White Space");
-        jButton4.addMouseListener(new java.awt.event.MouseAdapter() {
+        removeWhiteSpacesButton.setText("Remove White Space");
+        removeWhiteSpacesButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButton4MouseClicked(evt);
+                removeWhiteSpacesButtonMouseClicked(evt);
             }
         });
 
-        jButton3.setText("Remove Comments");
-        jButton3.addMouseListener(new java.awt.event.MouseAdapter() {
+        removeCommentsButton.setText("Remove Comments");
+        removeCommentsButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButton3MouseClicked(evt);
+                removeCommentsButtonMouseClicked(evt);
             }
         });
 
-        jButton2.setText("Recognize Constants");
-        jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+        recConstantsButton.setText("Recognize Constants");
+        recConstantsButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButton2MouseClicked(evt);
+                recConstantsButtonMouseClicked(evt);
             }
         });
 
-        jButton5.setText("Recognize Keywords");
-        jButton5.addMouseListener(new java.awt.event.MouseAdapter() {
+        recKeywordsButton.setText("Recognize Keywords");
+        recKeywordsButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButton5MouseClicked(evt);
+                recKeywordsButtonMouseClicked(evt);
             }
         });
 
-        jButton6.setText("Recognize Identifiers");
-        jButton6.addMouseListener(new java.awt.event.MouseAdapter() {
+        recIdentifiersButton.setText("Recognize Identifiers");
+        recIdentifiersButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButton6MouseClicked(evt);
+                recIdentifiersButtonMouseClicked(evt);
             }
         });
 
-        jButton7.setText("Recognize Operators");
-        jButton7.addMouseListener(new java.awt.event.MouseAdapter() {
+        recOperators.setText("Recognize Operators");
+        recOperators.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButton7MouseClicked(evt);
+                recOperatorsMouseClicked(evt);
+            }
+        });
+
+        lexemeTokenButton.setText("Lexeme Token Pairs");
+        lexemeTokenButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lexemeTokenButtonMouseClicked(evt);
+            }
+        });
+
+        symbolTblButton.setText("Symbol Tabel");
+        symbolTblButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                symbolTblButtonMouseClicked(evt);
             }
         });
 
@@ -148,13 +170,15 @@ private Map<String, SymbolInfo> symbolTable = new HashMap<>();
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(75, 75, 75)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(removeWhiteSpacesButton, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+                    .addComponent(removeCommentsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(recConstantsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(recKeywordsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(recIdentifiersButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(recOperators, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lexemeTokenButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(symbolTblButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 132, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
@@ -173,18 +197,22 @@ private Map<String, SymbolInfo> symbolTable = new HashMap<>();
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(130, 130, 130)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(67, 67, 67)
+                        .addComponent(removeCommentsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(removeWhiteSpacesButton, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(recConstantsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(recKeywordsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(recIdentifiersButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(recOperators, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lexemeTokenButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(symbolTblButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(22, Short.MAX_VALUE))
         );
 
@@ -218,26 +246,26 @@ private Map<String, SymbolInfo> symbolTable = new HashMap<>();
         }
     }//GEN-LAST:event_jButton1MouseClicked
 
-    private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseClicked
+    private void removeWhiteSpacesButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_removeWhiteSpacesButtonMouseClicked
         // TODO add your handling code here:
-        String contentWithOutSpace = templateContent.replaceAll("\\s+"," ");
+        String contentWithOutSpace = contentWithOutComments.replaceAll("\\s+"," ");
         jTextArea.setText(contentWithOutSpace);
 
         
-    }//GEN-LAST:event_jButton4MouseClicked
+    }//GEN-LAST:event_removeWhiteSpacesButtonMouseClicked
 
-    private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
+    private void removeCommentsButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_removeCommentsButtonMouseClicked
         // TODO add your handling code here:
         //contentWithOutComments = templateContent.replaceAll("(?s)/\\*.*?\\*/|//.*?(?=\\n)", "");
         jTextArea.setText(contentWithOutComments);
-    }//GEN-LAST:event_jButton3MouseClicked
+    }//GEN-LAST:event_removeCommentsButtonMouseClicked
 
-    private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
+    private void recConstantsButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_recConstantsButtonMouseClicked
         // TODO add your handling code here:
         List<String> constants = new ArrayList<>();
        
         String constantPattern = "\\b\\d+(\\.\\d+)?(f|F|d|D|l|L)?\\b";
-        Matcher constantMatcher = Pattern.compile(constantPattern).matcher(templateContent);
+        Matcher constantMatcher = Pattern.compile(constantPattern).matcher(contentWithOutComments);
         while (constantMatcher.find()){
            constants.add(constantMatcher.group());
         }
@@ -246,9 +274,9 @@ private Map<String, SymbolInfo> symbolTable = new HashMap<>();
             textContent.append(constant).append("\n");
         }
         jTextArea.setText(textContent.toString());
-    }//GEN-LAST:event_jButton2MouseClicked
+    }//GEN-LAST:event_recConstantsButtonMouseClicked
 
-    private void jButton5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton5MouseClicked
+    private void recKeywordsButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_recKeywordsButtonMouseClicked
         // TODO add your handling code here:
         String IDENTIFIER_REGEX = "\\b[A-Za-z_][A-Za-z0-9_]*\\b";
         Matcher identifierMatcher = Pattern.compile(IDENTIFIER_REGEX).matcher(contentWithOutComments);
@@ -262,34 +290,56 @@ private Map<String, SymbolInfo> symbolTable = new HashMap<>();
                 
             }
         }
-    }//GEN-LAST:event_jButton5MouseClicked
+    }//GEN-LAST:event_recKeywordsButtonMouseClicked
 
-    private void jButton6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton6MouseClicked
+    private void recIdentifiersButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_recIdentifiersButtonMouseClicked
         // TODO add your handling code here:
          String IDENTIFIER_REGEX = "\\b[A-Za-z_][A-Za-z0-9_]*\\b";
         Matcher identifierMatcher = Pattern.compile(IDENTIFIER_REGEX).matcher(contentWithOutComments);
         jTextArea.setText("");
         while(identifierMatcher.find()){
             String match = identifierMatcher.group();
-            if(KEYWORDS.contains(match)){
-                
-            }
-            else{
-                jTextArea.append(match + System.lineSeparator() );
-            }
+            if(!KEYWORDS.contains(match)){
+                storeInSymbolTable(match, "Identifier");
+                jTextArea.append(match + System.lineSeparator());
         }
-    }//GEN-LAST:event_jButton6MouseClicked
+        }
+    }//GEN-LAST:event_recIdentifiersButtonMouseClicked
 
-    private void jButton7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton7MouseClicked
+    private void recOperatorsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_recOperatorsMouseClicked
         // TODO add your handling code here:
         String OPERATORS_REGEX = "[+\\-*/=<>!]+";
         Matcher operatorMatcher = Pattern.compile(OPERATORS_REGEX).matcher(contentWithOutComments);
         StringBuilder operators = new StringBuilder();
+ 
         while (operatorMatcher.find()) {
+            String operator = operatorMatcher.group();
+            storeInSymbolTable(operator, "Operator");
+           
             operators.append(operatorMatcher.group()).append("\n");
         }
         jTextArea.setText(operators.toString());
-    }//GEN-LAST:event_jButton7MouseClicked
+    }//GEN-LAST:event_recOperatorsMouseClicked
+
+    private void lexemeTokenButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lexemeTokenButtonMouseClicked
+        // TODO add your handling code here:
+        StringBuilder lexemeTokenPairs = new StringBuilder();
+        for (Map.Entry<String, SymbolInfo> entry : symbolTable.entrySet()) {
+            lexemeTokenPairs.append("Lexeme: ").append(entry.getKey())
+                        .append(" ,   Token: ").append(entry.getValue().type)                  
+                        .append("\n");
+        }
+        jTextArea.setText(lexemeTokenPairs.toString());
+    }//GEN-LAST:event_lexemeTokenButtonMouseClicked
+
+    private void symbolTblButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_symbolTblButtonMouseClicked
+        // TODO add your handling code here:
+         StringBuilder symbolTableContent = new StringBuilder();
+         for (Map.Entry<String, SymbolInfo> entry : symbolTable.entrySet()) {
+            symbolTableContent.append(entry.getKey()).append(" -> ").append(entry.getValue().toString()).append("\n");
+        }
+         jTextArea.setText(symbolTableContent.toString());
+    }//GEN-LAST:event_symbolTblButtonMouseClicked
 
     /**
      * @param args the command line arguments
@@ -329,13 +379,15 @@ private Map<String, SymbolInfo> symbolTable = new HashMap<>();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField FilePathField;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea;
+    private javax.swing.JButton lexemeTokenButton;
+    private javax.swing.JButton recConstantsButton;
+    private javax.swing.JButton recIdentifiersButton;
+    private javax.swing.JButton recKeywordsButton;
+    private javax.swing.JButton recOperators;
+    private javax.swing.JButton removeCommentsButton;
+    private javax.swing.JButton removeWhiteSpacesButton;
+    private javax.swing.JButton symbolTblButton;
     // End of variables declaration//GEN-END:variables
 }
